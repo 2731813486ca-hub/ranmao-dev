@@ -1280,6 +1280,68 @@
       color: var(--color-accent);
     }
 
+    /* 二维码弹窗 */
+    .qr-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      z-index: 200;
+      background: #1A1815;
+      border: 1px solid var(--color-border-dark);
+      padding: 32px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: calc(100vw - 32px);
+      width: 340px;
+    }
+    .qr-popup.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    .qr-popup-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+    .qr-popup-label {
+      font-size: 13px;
+      color: var(--color-text-dark-muted);
+      margin-top: 16px;
+      font-weight: 300;
+    }
+    .qr-popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--color-text-dark-dim);
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s ease;
+    }
+    .qr-popup-close:hover {
+      color: var(--color-text-dark);
+    }
+    .qr-popup-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 199;
+      background: rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .qr-popup-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     /* Footer 社交图标 */
     .footer-social {
       display: flex;
@@ -1726,6 +1788,18 @@
       </button>
     </div>
 
+    <!-- 二维码弹窗 -->
+    <div class="qr-popup-backdrop" data-qr-backdrop></div>
+    <div class="qr-popup" data-qr-popup>
+      <button class="qr-popup-close" data-qr-close>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>
+        </svg>
+      </button>
+      <img class="qr-popup-image" data-qr-image src="" alt="二维码" />
+      <p class="qr-popup-label" data-qr-label></p>
+    </div>
+
     <!-- ============================================
          Footer
          ============================================ -->
@@ -1777,9 +1851,11 @@
         year: '2025',
         type: '公众号',
         tech: ['Markdown', '写作'],
-        heroImage: 'images/qrcode_公众号.png',
+        heroImage: 'images/公众号顶图.png',
         link: '#',
-        linkLabel: '关注公众号'
+        linkLabel: '关注公众号',
+        qrImage: 'images/qrcode_公众号.png',
+        qrLabel: '扫码关注公众号'
       },
       {
         id: 'linshen',
@@ -1795,9 +1871,11 @@
         year: '2026',
         type: '微信小程序',
         tech: ['原生开发', 'Codex AI'],
-        heroImage: 'images/qrcode_林深有径.png',
+        heroImage: 'images/小程序顶图.png',
         link: '#',
-        linkLabel: '打开小程序'
+        linkLabel: '打开小程序',
+        qrImage: 'images/qrcode_林深有径.png',
+        qrLabel: '扫码打开小程序'
       },
       {
         id: 'website',
@@ -1957,6 +2035,8 @@
         var cta = detailEl.querySelector('[data-project-link]');
         cta.href = project.link;
         cta.querySelector('[data-project-link-label]').textContent = project.linkLabel;
+        // 存储二维码信息供点击拦截使用
+        cta.dataset.hasQr = project.qrImage ? 'true' : 'false';
 
         // 计数器
         var idx = projects.indexOf(project);
@@ -2024,6 +2104,9 @@
           }
           if (wechatPopup && wechatPopup.classList.contains('active')) {
             closeWechatPopup();
+          }
+          if (qrPopup && qrPopup.classList.contains('active')) {
+            closeQrPopup();
           }
         }
       });
@@ -2135,6 +2218,44 @@
         }
         document.body.removeChild(textarea);
       }
+
+      // ============================================
+      // 8. 二维码弹窗（项目详情 CTA）
+      // ============================================
+      var qrPopup = document.querySelector('[data-qr-popup]');
+      var qrBackdrop = document.querySelector('[data-qr-backdrop]');
+      var qrImage = qrPopup.querySelector('[data-qr-image]');
+      var qrLabel = qrPopup.querySelector('[data-qr-label]');
+
+      function openQrPopup(imgSrc, label) {
+        qrImage.src = imgSrc;
+        qrImage.alt = label || '二维码';
+        qrLabel.textContent = label || '';
+        qrPopup.classList.add('active');
+        qrBackdrop.classList.add('active');
+      }
+
+      function closeQrPopup() {
+        qrPopup.classList.remove('active');
+        qrBackdrop.classList.remove('active');
+      }
+
+      // CTA 点击拦截 — 有二维码的项目弹出显示，否则正常跳转
+      detailEl.querySelector('[data-project-link]').addEventListener('click', function(e) {
+        if (this.dataset.hasQr === 'true') {
+          e.preventDefault();
+          var proj = findProject(detailEl.dataset.projectId);
+          if (proj && proj.qrImage) {
+            closeProjectDetail();
+            setTimeout(function() {
+              openQrPopup(proj.qrImage, proj.qrLabel);
+            }, 350);
+          }
+        }
+      });
+
+      qrPopup.querySelector('[data-qr-close]').addEventListener('click', closeQrPopup);
+      qrBackdrop.addEventListener('click', closeQrPopup);
     });
   </script>
 </body>
