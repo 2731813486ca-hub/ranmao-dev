@@ -2240,16 +2240,13 @@
         qrBackdrop.classList.remove('active');
       }
 
-      // CTA 点击拦截 — 有二维码的项目弹出显示，否则正常跳转
+      // CTA 点击拦截 — 有二维码的项目在详情页内弹出显示，否则正常跳转
       detailEl.querySelector('[data-project-link]').addEventListener('click', function(e) {
         if (this.dataset.hasQr === 'true') {
           e.preventDefault();
           var proj = findProject(detailEl.dataset.projectId);
           if (proj && proj.qrImage) {
-            closeProjectDetail();
-            setTimeout(function() {
-              openQrPopup(proj.qrImage, proj.qrLabel);
-            }, 350);
+            openQrPopup(proj.qrImage, proj.qrLabel);
           }
         }
       });
