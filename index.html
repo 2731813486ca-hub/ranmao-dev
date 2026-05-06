@@ -50,7 +50,6 @@
 
       --transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-reveal: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     /* ============================================
@@ -1790,7 +1789,7 @@
       <div class="project-detail-body">
         <!-- 英雄图区域 -->
         <div class="project-hero" data-project-hero>
-          <img class="project-hero-img" data-project-img src="" alt="" />
+          <img class="project-hero-img" data-project-img src="" alt="" loading="lazy" />
           <div class="project-hero-overlay"></div>
           <!-- 无图片时的降级占位 -->
           <div class="project-hero-placeholder">
@@ -2152,7 +2151,7 @@
           });
         });
 
-        location.hash = 'project-' + projectId;
+        history.replaceState(null, '', '#project-' + projectId);
       }
 
       function closeProjectDetail() {
@@ -2165,7 +2164,7 @@
         }
 
         if (location.hash.startsWith('#project-')) {
-          history.pushState(null, '', window.location.pathname);
+          history.replaceState(null, '', window.location.pathname);
         }
       }
 
@@ -2267,6 +2266,12 @@
           }
           openWechatPopup();
         });
+        btn.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openWechatPopup();
+          }
+        });
       });
 
       if (wechatBackdrop) {
@@ -2279,7 +2284,7 @@
         copyBtn.addEventListener('click', function() {
           var text = 'ca2731813486';
           var label = this.querySelector('[data-copy-label]');
-          if (navigator.clipboard && navigator.clipboard.writeText) {
+          if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(function() {
               label.textContent = '已复制！';
               copyBtn.classList.add('copied');
@@ -2377,6 +2382,12 @@
         el.addEventListener('click', function(e) {
           e.preventDefault();
           openLinkPopup(this.dataset.linkTitle, this.dataset.linkUrl);
+        });
+        el.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openLinkPopup(this.dataset.linkTitle, this.dataset.linkUrl);
+          }
         });
       });
     });
