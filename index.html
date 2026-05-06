@@ -1342,6 +1342,74 @@
       pointer-events: auto;
     }
 
+    /* 链接弹窗（底部图标） */
+    .link-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      z-index: 200;
+      background: #1A1815;
+      border: 1px solid var(--color-border-dark);
+      padding: 32px 36px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: calc(100vw - 32px);
+      width: 320px;
+    }
+    .link-popup.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    .link-popup-title {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--color-text-dark);
+      margin-bottom: 8px;
+    }
+    .link-popup-url {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-text-dark-muted);
+      margin-bottom: 24px;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+    .link-popup .btn-primary {
+      padding: 12px 32px;
+      font-size: 13px;
+    }
+    .link-popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--color-text-dark-dim);
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .link-popup-close:hover {
+      color: var(--color-text-dark);
+    }
+    .link-popup-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 199;
+      background: rgba(0,0,0,0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .link-popup-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     /* Footer 社交图标 */
     .footer-social {
       display: flex;
@@ -1800,6 +1868,20 @@
       <p class="qr-popup-label" data-qr-label></p>
     </div>
 
+    <!-- 链接弹窗（底部图标） -->
+    <div class="link-popup-backdrop" data-link-backdrop></div>
+    <div class="link-popup" data-link-popup>
+      <button class="link-popup-close" data-link-popup-close>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+      <div class="link-popup-title" data-link-popup-title></div>
+      <div class="link-popup-url" data-link-popup-url></div>
+      <a class="btn-primary" data-link-popup-btn href="#" target="_blank" rel="noopener">
+        打开链接
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+      </a>
+    </div>
+
     <!-- ============================================
          Footer
          ============================================ -->
@@ -1807,12 +1889,12 @@
       <div class="footer-inner">
         <span>© 2026 燃猫 · ranmao.dev</span>
         <div class="footer-social">
-          <a class="footer-social-link" href="https://mail.qq.com/" title="QQ 邮箱" target="_blank" rel="noopener">
+          <span class="footer-social-link" title="QQ 邮箱" data-link-trigger data-link-title="QQ 邮箱" data-link-url="https://mail.qq.com/" role="button" tabindex="0">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="2" y="4" width="20" height="16" rx="2"/>
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
             </svg>
-          </a>
+          </span>
           <span class="footer-social-link" title="微信" data-wechat role="button" tabindex="0">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M21 15c0 3.87-4.03 7-9 7l-3-1.5L6 21l1.5-3.5C5.6 15.9 3 13.6 3 10.5 3 6.36 7.03 3 12 3s9 3.36 9 7.5c0 1.86-.83 3.55-2.14 4.86"/>
@@ -1820,12 +1902,12 @@
               <circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none"/>
             </svg>
           </span>
-          <a class="footer-social-link" href="https://github.com/2731813486ca-hub" title="GitHub" target="_blank" rel="noopener">
+          <span class="footer-social-link" title="GitHub" data-link-trigger data-link-title="GitHub" data-link-url="https://github.com/2731813486ca-hub" role="button" tabindex="0">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
               <path d="M9 18c-4.51 2-5-2-7-2"></path>
             </svg>
-          </a>
+          </span>
         </div>
         <span>Chongqing, China</span>
       </div>
@@ -1896,6 +1978,14 @@
         linkLabel: '访问网站'
       }
     ];
+
+    // 预加载项目顶图，打开详情页时无需等待图片加载
+    projects.forEach(function(p) {
+      if (p.heroImage) {
+        var img = new window.Image();
+        img.src = p.heroImage;
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
       // ============================================
@@ -2108,6 +2198,9 @@
           if (qrPopup && qrPopup.classList.contains('active')) {
             closeQrPopup();
           }
+          if (linkPopup && linkPopup.classList.contains('active')) {
+            closeLinkPopup();
+          }
         }
       });
 
@@ -2253,6 +2346,38 @@
 
       qrPopup.querySelector('[data-qr-close]').addEventListener('click', closeQrPopup);
       qrBackdrop.addEventListener('click', closeQrPopup);
+
+      // ============================================
+      // 9. 链接弹窗（底部图标）
+      // ============================================
+      var linkPopup = document.querySelector('[data-link-popup]');
+      var linkBackdrop = document.querySelector('[data-link-backdrop]');
+      var linkTitle = linkPopup.querySelector('[data-link-popup-title]');
+      var linkUrl = linkPopup.querySelector('[data-link-popup-url]');
+      var linkBtn = linkPopup.querySelector('[data-link-popup-btn]');
+
+      function openLinkPopup(title, url) {
+        linkTitle.textContent = title;
+        linkUrl.textContent = url;
+        linkBtn.href = url;
+        linkPopup.classList.add('active');
+        linkBackdrop.classList.add('active');
+      }
+
+      function closeLinkPopup() {
+        linkPopup.classList.remove('active');
+        linkBackdrop.classList.remove('active');
+      }
+
+      linkPopup.querySelector('[data-link-popup-close]').addEventListener('click', closeLinkPopup);
+      linkBackdrop.addEventListener('click', closeLinkPopup);
+
+      document.querySelectorAll('[data-link-trigger]').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          openLinkPopup(this.dataset.linkTitle, this.dataset.linkUrl);
+        });
+      });
     });
   </script>
 </body>
